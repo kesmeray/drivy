@@ -17,6 +17,9 @@ var cars = [{
   'pricePerKm': 0.45
 }];
 
+
+
+
 //list of rentals
 //useful for ALL exercises
 //The `price` is updated from exercice 1
@@ -153,6 +156,93 @@ var actors = [{
     'amount': 0
   }]
 }];
+
+
+function getDays(beginDate,returnDate){
+var begin=new Date(beginDate).getTime();
+var end=new Date(returnDate).getTime();
+return (end-begin)/86400000;
+}
+
+function exos(){
+	
+//////////// EXO 1: Euro- Kilometer	
+	for(var i=0;i<rentals.length;i++){
+		var perday=0;
+		var perkm=0;	
+		for(var j=0; j<cars.length;j++){		
+			if(rentals[i].carId==cars[j].id)
+			{
+				perday=cars[j].pricePerDay;
+				perkm=cars[j].pricePerKm;				
+			}
+		}
+		//var price=rentals[i].distance*perkm+ (getDays(rentals[i].pickupDate,rentals[i].returnDate)+1)*perday;
+		//rentals[i].price=rentals[i].distance*perkm+ (getDays(rentals[i].pickupDate,rentals[i].returnDate)+1)*perday;
+					
+			var	price=rentals[i].distance*perkm+ 1*perday;
+				var days =getDays(rentals[i].pickupDate,rentals[i].returnDate);
+				
+////////////// EXO 2: Drive more, pay less
+				
+		if(days+1>1 && days+1<=4){
+			price +=days*perday*0.9;
+		}
+		else if(days+1>4 && days+1<=10){
+			price+=3*perday*0.9;
+			days-=3;
+			price+=days*perday*0.7;
+		}
+		else if(days+1>10){
+						price+=3*perday*0.9;
+						days-=days-3;
+						price+=6*perday*0.7;
+						days-=6;
+						price+=days*perday*0.5;		
+		}		
+////////////////// EXO 3: GIVE ME ALL YOUR MONEY		
+				rentals[i].price=price;				
+				var commission=price*0.3;
+				days =getDays(rentals[i].pickupDate,rentals[i].returnDate)+1;
+				rentals[i].commission.insurance= commission*0.5;
+				rentals[i].commission.assistance=days
+				commission=(commission*0.5)-days;
+				rentals[i].commission.drivy=commission;
+			
+			
+/////////////////// EXO 4: The famous deductible			
+			if(rentals[i].options.deductibleReduction){
+				rentals[i].price+=days*4;
+				rentals[i].commission.drivy+=days*4;
+			}
+//////////////////
+	}
+}
+exos(rentals,cars);
+
+function exo5(){
+	for(var i=0;i<actors.length;i++){
+		for(var j=0;j<rentals.length;j++){
+		if(actors[i].rentalId==rentals[j].id){
+			for(var k=0;k<actors[i].payment.length;k++){
+				if(actors[i].payment[k].who=='driver'){
+			actors[i].payment[k].amount+=rentals[j].price;
+			}else if(actors[i].payment[k].who=='insurance'){
+			actors[i].payment[k].amount+=rentals[j].commission.insurance;
+			}else if(actors[i].payment[k].who=='assistance'){
+			actors[i].payment[k].amount+=rentals[j].commission.assistance;
+			}else if(actors[i].payment[k].who=='drivy'){
+			actors[i].payment[k].amount+=rentals[j].commission.drivy;
+			}else if(actors[i].payment[k].who=='owner'){
+			actors[i].payment[k].amount+=rentals[j].price-rentals[j].commission.insurance-rentals[j].commission.assistance-rentals[j].commission.drivy;
+			}
+			}
+		}
+	}
+	}
+}
+exo5();
+
 
 //list of rental modifcation
 //useful for exercise 6
